@@ -30,6 +30,10 @@
 (define-constant ERR_INVALID_PHASE (err u4))
 (define-constant ERR_INVALID_VALIDATION (err u5))
 (define-constant ERR_VALIDATION_EXISTS (err u6))
+(define-constant ERR_INVALID_PRINCIPAL (err u7))
+
+;; Define zero address constant for validation
+(define-constant ZERO_ADDRESS 'SP000000000000000000002Q6VF78)
 
 ;; Contract owner
 (define-data-var contract-admin principal tx-sender)
@@ -88,6 +92,11 @@
 ;; Validate item ID
 (define-private (is-valid-item-id (item-id uint))
   (and (> item-id u0) (<= item-id u1000000))
+)
+
+;; Validate principal address
+(define-private (is-valid-principal (address principal))
+  (not (is-eq address ZERO_ADDRESS))
 )
 
 ;; Check if sender is approved validator
@@ -156,6 +165,15 @@
   (begin
     (asserts! (is-contract-admin tx-sender) ERR_NOT_AUTHORIZED)
     (asserts! (is-valid-validation-type validation-type) ERR_INVALID_VALIDATION)
+    (asserts! (is-valid-principal validator) ERR_INVALID_PRINCIPAL)
+    
+    ;; Check if validator is already approved for this validation type
+    (asserts! 
+      (is-none 
+        (map-get? authorized-validators {validator: validator, validation-type: validation-type})
+      )
+      ERR_VALIDATION_EXISTS
+    )
     
     (map-set authorized-validators
       {validator: validator, validation-type: validation-type}
