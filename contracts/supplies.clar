@@ -110,7 +110,7 @@
       {
         custodian: tx-sender,
         current-phase: initial-phase,
-        timeline: (list {phase: initial-phase, timestamp: stacks-block-height})
+        timeline: (list {phase: initial-phase, timestamp: block-height})
       }
     )
     (ok true)
@@ -140,7 +140,7 @@
           current-phase: new-phase,
           timeline: (unwrap-panic 
             (as-max-len? 
-              (append (get timeline item) {phase: new-phase, timestamp: stacks-block-height}) 
+              (append (get timeline item) {phase: new-phase, timestamp: block-height}) 
               u10
             )
           )
@@ -183,7 +183,7 @@
       {item-id: item-id, validation-type: validation-type}
       {
         validator: tx-sender,
-        timestamp: stacks-block-height,
+        timestamp: block-height,
         active: true
       }
     )
